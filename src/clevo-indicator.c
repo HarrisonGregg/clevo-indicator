@@ -96,7 +96,7 @@
 #define DUTY_STEP 5
 #define TEMP_STEP 5
 
-#define TEMP_LOW  55
+#define TEMP_LOW  58
 #define TEMP_MID  65
 #define TEMP_HIGH 70
 #define TEMP_CRIT 75
@@ -473,6 +473,7 @@ static void ec_on_sigterm(int signum) {
 }
 
 static int ec_auto_duty_adjust(void) {
+
     int temp = MAX(share_info->cpu_temp, share_info->gpu_temp);
     int speed;
     int duty = share_info->fan_duty;
@@ -481,25 +482,15 @@ static int ec_auto_duty_adjust(void) {
 
     // Round temperature to TEMP_STEP
     temp = temp - temp % TEMP_STEP;
-    if(temp >= TEMP_HIGH){
-        // Performance mode, round speed to TEMP_STEP up
-        temp += TEMP_STEP;
-        speed = temp + DUTY_STEP;
-        if(temp > TEMP_CRIT){
-            speed += DUTY_STEP;
-            speed = speed > MAX_DUTY ? MAX_DUTY : speed;
-        }
-    }else{
-        // Quiet mode temp
-        speed = temp - DUTY_STEP;
-        if(temp <= TEMP_MID){
-            speed -= DUTY_STEP;
-            if(temp <= TEMP_LOW){
-                speed -= DUTY_STEP;
-                speed = speed < MIN_DUTY ? MIN_DUTY : speed;
-            }
-        }
+
+    if (temp < TEMP_LOW){
+        speed = MIN_DUTY;
+    } else if (temp < TEMP_CRIT) {
+        speed = 20+5*(temp-TEMP_LOW-1);
+    } else {
+        speed = MAX_DUTY;
     }
+
     // Avoid quick speed changes
     if(skip < maxskip && speed <= duty + 2*DUTY_STEP){
         ++skip;
