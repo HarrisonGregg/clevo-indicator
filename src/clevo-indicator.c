@@ -94,7 +94,7 @@
 #define MAX_DUTY 100
 
 #define DUTY_STEP 5
-#define TEMP_STEP 5
+#define TEMP_STEP 1
 
 #define TEMP_LOW  58
 #define TEMP_MID  65
