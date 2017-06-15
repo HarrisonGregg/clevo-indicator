@@ -90,13 +90,13 @@
  *      where n is the number of threshold overpassed by temp (between 1 and 2)
  */
 
-#define MIN_DUTY 10
+#define MIN_DUTY 0
 #define MAX_DUTY 100
 
 #define DUTY_STEP 5
 #define TEMP_STEP 1
 
-#define TEMP_LOW  58
+#define TEMP_LOW  59
 #define TEMP_MID  65
 #define TEMP_HIGH 70
 #define TEMP_CRIT 75
@@ -294,8 +294,7 @@ static int main_ec_worker(void) {
         }
         // write EC
         int new_fan_duty = share_info->manual_next_fan_duty;
-        if (new_fan_duty != 0
-                && new_fan_duty != share_info->manual_prev_fan_duty) {
+        if (new_fan_duty != share_info->manual_prev_fan_duty) {
             ec_write_fan_duty(new_fan_duty);
             share_info->manual_prev_fan_duty = new_fan_duty;
         }
@@ -329,7 +328,7 @@ static int main_ec_worker(void) {
         // auto EC
         if (share_info->auto_duty == 1) {
             int next_duty = ec_auto_duty_adjust();
-            if (next_duty != 0 && next_duty != share_info->auto_duty_val) {
+            if (next_duty != share_info->auto_duty_val) {
                 char s_time[256];
                 get_time_string(s_time, 256, "%m/%d %H:%M:%S");
                 printf("%s CPU=%d°C, GPU=%d°C, auto fan duty to %d%%\n", s_time,
@@ -483,10 +482,10 @@ static int ec_auto_duty_adjust(void) {
     // Round temperature to TEMP_STEP
     temp = temp - temp % TEMP_STEP;
 
-    if (temp < TEMP_LOW){
+    if (temp <= TEMP_LOW){
         speed = MIN_DUTY;
     } else if (temp < TEMP_CRIT) {
-        speed = 20+5*(temp-TEMP_LOW-1);
+        speed = 20+5*(temp-TEMP_LOW);
     } else {
         speed = MAX_DUTY;
     }
