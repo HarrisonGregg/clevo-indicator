@@ -90,15 +90,15 @@
  *      where n is the number of threshold overpassed by temp (between 1 and 2)
  */
 
-#define MIN_DUTY 25
+#define MIN_DUTY 10
 #define MAX_DUTY 100
 
 #define DUTY_STEP 5
 #define TEMP_STEP 5
 
-#define TEMP_LOW  45
-#define TEMP_MID  55
-#define TEMP_HIGH 65
+#define TEMP_LOW  55
+#define TEMP_MID  65
+#define TEMP_HIGH 70
 #define TEMP_CRIT 75
 
 typedef enum {
